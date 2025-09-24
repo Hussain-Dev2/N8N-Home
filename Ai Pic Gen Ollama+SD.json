@@ -1,0 +1,118 @@
+{
+  "name": "Ai Pic Gen Ollama + StableDiffusion",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": ["message"]
+      },
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [120, -240],
+      "id": "telegram-trigger",
+      "credentials": {
+        "telegramApi": {
+          "id": "your-telegram-id",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://ollama:11434/api/generate",
+        "sendBody": true,
+        "jsonParameters": true,
+        "body": {
+          "model": "mistral",
+          "prompt": "={{ $json.message.text }}"
+        }
+      },
+      "name": "Ollama Generate Prompt",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [360, -240],
+      "id": "ollama-generate"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { prompt: $json.response } }];"
+      },
+      "name": "Extract Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [560, -240],
+      "id": "extract-prompt"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:7860/sdapi/v1/txt2img",
+        "sendBody": true,
+        "jsonParameters": true,
+        "body": {
+          "prompt": "={{ $json.prompt }}",
+          "steps": 20,
+          "width": 512,
+          "height": 768,
+          "sampler_index": "Euler a"
+        }
+      },
+      "name": "Stable Diffusion Generate",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [760, -240],
+      "id": "sd-generate"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "images[0]",
+        "options": {
+          "dataIsBase64": true,
+          "fileName": "ai_image.png"
+        }
+      },
+      "name": "Convert Image",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [960, -240],
+      "id": "convert-image"
+    },
+    {
+      "parameters": {
+        "operation": "sendPhoto",
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "file": "={{ $binary.ai_image.data }}"
+      },
+      "name": "Send Telegram Photo",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [1160, -240],
+      "id": "send-telegram-photo",
+      "credentials": {
+        "telegramApi": {
+          "id": "your-telegram-id",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {
+      "main": [[{ "node": "Ollama Generate Prompt", "type": "main", "index": 0 }]]
+    },
+    "Ollama Generate Prompt": {
+      "main": [[{ "node": "Extract Prompt", "type": "main", "index": 0 }]]
+    },
+    "Extract Prompt": {
+      "main": [[{ "node": "Stable Diffusion Generate", "type": "main", "index": 0 }]]
+    },
+    "Stable Diffusion Generate": {
+      "main": [[{ "node": "Convert Image", "type": "main", "index": 0 }]]
+    },
+    "Convert Image": {
+      "main": [[{ "node": "Send Telegram Photo", "type": "main", "index": 0 }]]
+    }
+  }
+}

@@ -1,0 +1,33 @@
+version: "3.8"
+services:
+  n8n:
+    container_name: n8n
+    build: .
+    environment:
+      - NPM_CONFIG_LOGLEVEL=warn
+      - NODE_FUNCTION_ALLOW_EXTERNAL=n8n-nodes-telegram
+      - N8N_HOST=my-n8n.onrender.com       # ضع هنا Render URL الخاص بك
+      - N8N_PORT=$PORT
+      - GENERIC_TIMEZONE=Asia/Baghdad
+      - N8N_PROTOCOL=https
+      - OLLAMA_URL=http://ollama:11434    # n8n يتواصل مع Ollama داخليًا
+    ports:
+      - "$PORT:$PORT"
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./shared:/data/shared
+    restart: unless-stopped
+    depends_on:
+      - ollama
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: always
+    ports:
+      - "11434:11434"      # داخل الشبكة فقط، للوصول من n8n
+    volumes:
+      - ./ollama_data:/root/.ollama
+
+volumes:
+  n8n_data:
