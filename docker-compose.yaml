@@ -6,7 +6,7 @@ services:
     environment:
       - NPM_CONFIG_LOGLEVEL=warn
       - NODE_FUNCTION_ALLOW_EXTERNAL=n8n-nodes-telegram
-      - N8N_HOST=my-n8n.onrender.com       # ضع هنا Render URL الخاص بك
+      - N8N_HOST=https://n8n-home-enk1.onrender.com       # ضع هنا Render URL الخاص بك
       - N8N_PORT=$PORT
       - GENERIC_TIMEZONE=Asia/Baghdad
       - N8N_PROTOCOL=https
