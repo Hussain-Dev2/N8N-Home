@@ -5,12 +5,12 @@ services:
     build: .
     environment:
       - NPM_CONFIG_LOGLEVEL=warn
-      
-      - N8N_HOST=https://n8n-home-enk1.onrender.com       # ضع هنا Render URL الخاص بك
-      - N8N_PORT=$PORT
-      - GENERIC_TIMEZONE=Asia/Baghdad
+      - NODE_FUNCTION_ALLOW_EXTERNAL=telegram-bot-api
+      - N8N_HOST=n8n-home-enk1.onrender.com   # ضع هنا Render URL الخاص بك
+      - N8N_PORT=$PORT                         # داخلي فقط
       - N8N_PROTOCOL=https
-      - OLLAMA_URL=http://ollama:11434    # n8n يتواصل مع Ollama داخليًا
+      - GENERIC_TIMEZONE=Asia/Baghdad
+      - OLLAMA_URL=http://ollama:11434        # n8n يتواصل مع Ollama داخليًا
     ports:
       - "$PORT:$PORT"
     volumes:
@@ -25,7 +25,7 @@ services:
     container_name: ollama
     restart: always
     ports:
-      - "11434:11434"      # داخل الشبكة فقط، للوصول من n8n
+      - "11434:11434"      # داخليًا، للوصول من n8n
     volumes:
       - ./ollama_data:/root/.ollama
 
