@@ -1,4 +1,4 @@
-FROM n8nio/n8n:0.262.0
+FROM n8nio/n8n:latest
 
 # تثبيت ffmpeg فقط، Telegram Node موجودة ضمن core nodes
 USER root
