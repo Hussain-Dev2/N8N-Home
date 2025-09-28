@@ -6,17 +6,11 @@ services:
     environment:
       - NPM_CONFIG_LOGLEVEL=warn
       - NODE_FUNCTION_ALLOW_EXTERNAL=telegram-bot-api
-      - N8N_HOST=n8n-home-enk1.onrender.com      
+      - N8N_HOST=n8n-home-enk1.onrender.com
       - N8N_PROTOCOL=https
       - GENERIC_TIMEZONE=Asia/Baghdad
       - OLLAMA_URL=http://ollama:11434
-      - N8N_PORT=${PORT}
-      - N8N_HOST=n8n-home-enk1.onrender.com
-      - N8N_PROTOCOL=https
       - WEBHOOK_URL=https://n8n-home-enk1.onrender.com
-       # n8n يتواصل مع Ollama داخليًا
-    ports:
-      - "$PORT:$PORT"
     volumes:
       - n8n_data:/home/node/.n8n
       - ./shared:/data/shared
@@ -29,7 +23,7 @@ services:
     container_name: ollama
     restart: always
     ports:
-      - "11434:11434"      # داخليًا، للوصول من n8n
+      - "11434:11434"
     volumes:
       - ./ollama_data:/root/.ollama
 
