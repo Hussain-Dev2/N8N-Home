@@ -13,6 +13,7 @@ services:
       - OLLAMA_URL=http://ollama:11434
       - WEBHOOK_URL=https://n8n-home-enk1.onrender.com
       - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
+      - ENV N8N_PORT=443
     volumes:
       - n8n_data:/home/node/.n8n
       - ./shared:/data/shared
