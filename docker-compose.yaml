@@ -3,6 +3,7 @@ services:
   n8n:
     container_name: n8n
     build: .
+    command: n8n
     environment:
       - NPM_CONFIG_LOGLEVEL=warn
       - NODE_FUNCTION_ALLOW_EXTERNAL=telegram-bot-api
@@ -11,6 +12,7 @@ services:
       - GENERIC_TIMEZONE=Asia/Baghdad
       - OLLAMA_URL=http://ollama:11434
       - WEBHOOK_URL=https://n8n-home-enk1.onrender.com
+      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
     volumes:
       - n8n_data:/home/node/.n8n
       - ./shared:/data/shared

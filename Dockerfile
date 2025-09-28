@@ -1,11 +1,11 @@
 FROM n8nio/n8n:latest
 
-
-# Render بيوفر المتغير PORT أوتوماتيكياً
-ENV N8N_PORT=${PORT}
+# Host & Protocol
 ENV N8N_HOST=n8n-home-enk1.onrender.com
 ENV N8N_PROTOCOL=https
+ENV N8N_PORT=5678
 
-EXPOSE ${PORT}
+# Expose default n8n port
+EXPOSE 5678
 
-CMD ["n8n", "start"]
+CMD ["n8n"]
