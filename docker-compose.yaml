@@ -2,8 +2,11 @@ version: "3.8"
 services:
   n8n:
     container_name: n8n
-    build: .
-    command: n8n
+    build:
+      context: .
+      dockerfile: Dockerfile.n8n
+    image: n8n/custom:latest
+    command: ["n8n", "start"]
     environment:
       - NPM_CONFIG_LOGLEVEL=warn
       - NODE_FUNCTION_ALLOW_EXTERNAL=telegram-bot-api
@@ -13,7 +16,9 @@ services:
       - OLLAMA_URL=http://ollama:11434
       - WEBHOOK_URL=https://n8n-home-enk1.onrender.com
       - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
-      - ENV N8N_PORT=443
+      - N8N_PORT=5678
+    ports:
+      - "5678:5678"
     volumes:
       - n8n_data:/home/node/.n8n
       - ./shared:/data/shared
