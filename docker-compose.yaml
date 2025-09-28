@@ -9,7 +9,12 @@ services:
       - N8N_HOST=n8n-home-enk1.onrender.com      
       - N8N_PROTOCOL=https
       - GENERIC_TIMEZONE=Asia/Baghdad
-      - OLLAMA_URL=http://ollama:11434        # n8n يتواصل مع Ollama داخليًا
+      - OLLAMA_URL=http://ollama:11434
+      - N8N_PORT=${PORT}
+      - N8N_HOST=n8n-home-enk1.onrender.com
+      - N8N_PROTOCOL=https
+      - WEBHOOK_URL=https://n8n-home-enk1.onrender.com
+       # n8n يتواصل مع Ollama داخليًا
     ports:
       - "$PORT:$PORT"
     volumes:
