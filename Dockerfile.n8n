@@ -1,8 +1,8 @@
 FROM n8nio/n8n:latest
 
 # Copy a small entrypoint script to allow using $PORT from Render
-COPY start-n8n.sh /usr/local/bin/start-n8n.sh
-RUN chmod +x /usr/local/bin/start-n8n.sh
+COPY --chmod=0755 start-n8n.sh /usr/local/bin/start-n8n.sh
+COPY --chmod=0755 register-telegram-webhook.sh /usr/local/bin/register-telegram-webhook.sh
 
 ENTRYPOINT ["/usr/local/bin/start-n8n.sh"]
 # Do not hardcode N8N_PORT here; allow the entrypoint or runtime to set it
