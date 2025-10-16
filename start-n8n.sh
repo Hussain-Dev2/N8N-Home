@@ -42,12 +42,18 @@ else
   # If the first arg is the literal 'n8n', replace it with an absolute path if needed
   if [ "$1" = "n8n" ]; then
     if command -v n8n >/dev/null 2>&1; then
-      set -- "$(command -v n8n)" "${@:2}"
+      BINPATH="$(command -v n8n)"
     elif [ -x "/usr/local/bin/n8n" ]; then
-      set -- "/usr/local/bin/n8n" "${@:2}"
+      BINPATH="/usr/local/bin/n8n"
     elif [ -x "/usr/bin/n8n" ]; then
-      set -- "/usr/bin/n8n" "${@:2}"
+      BINPATH="/usr/bin/n8n"
+    else
+      BINPATH="n8n"
     fi
+    # remove the first arg and rebuild args with absolute path first
+    shift
+    set -- "$BINPATH" "$@"
+  fi
   fi
   exec "$@"
 fi
