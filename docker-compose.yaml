@@ -1,39 +1,33 @@
-version: "3.8"
 services:
   n8n:
     container_name: n8n
     build:
       context: .
       dockerfile: Dockerfile.n8n
-    image: n8n/custom:latest
-    command: ["n8n", "start"]
+    # NOTE: Do NOT add an `image:` field here — it overrides build: and prevents
+    # Dockerfile.n8n from being used. Remove image: if you see it.
     environment:
       - NPM_CONFIG_LOGLEVEL=warn
       - NODE_FUNCTION_ALLOW_EXTERNAL=telegram-bot-api
       - N8N_HOST=n8n-home-enk1.onrender.com
       - N8N_PROTOCOL=https
       - GENERIC_TIMEZONE=Asia/Baghdad
-      - OLLAMA_URL=http://ollama:11434
+      
       - WEBHOOK_URL=https://n8n-home-enk1.onrender.com
       - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
-      - N8N_PORT=5678
+      # N8N_PORT is intentionally omitted here.
+      # start-n8n.sh sets it from Render's $PORT at runtime, falling back to 5678.
+      # Setting it here would prevent that override from working.
+    env_file:
+      # Create a .env file with your secrets (never commit it):
+      #   TELEGRAM_BOT_TOKEN=your_token_here
+      - .env
     ports:
       - "5678:5678"
     volumes:
       - n8n_data:/home/node/.n8n
       - ./shared:/data/shared
     restart: unless-stopped
-    depends_on:
-      - ollama
-
-  ollama:
-    image: ollama/ollama:latest
-    container_name: ollama
-    restart: always
-    ports:
-      - "11434:11434"
-    volumes:
-      - ./ollama_data:/root/.ollama
 
 volumes:
   n8n_data:

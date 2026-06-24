@@ -1,30 +1,27 @@
 #!/bin/sh
-# start-n8n.sh - sets N8N_PORT from Render's $PORT if present and starts n8n
+# start-n8n.sh
+# Maps Render's $PORT → N8N_PORT, registers the Telegram webhook, then starts n8n.
 
-# If Render (or any platform) sets PORT, prefer it for N8N
-if [ -n "$PORT" ]; then
+# If the platform (e.g. Render) injects $PORT, use it for n8n
+if [ -n "${PORT:-}" ]; then
   export N8N_PORT="$PORT"
 fi
 
-# Ensure default port if not set
-if [ -z "$N8N_PORT" ]; then
+# Fall back to default port if still unset
+if [ -z "${N8N_PORT:-}" ]; then
   export N8N_PORT=5678
 fi
 
-# Optional: allow overriding HOST/PROTOCOL via environment variables (keep as-is if not provided)
-# If you want defaults, uncomment and set them here.
-# : ${N8N_HOST:=example.com}
-# : ${N8N_PROTOCOL:=https}
-
-# Register Telegram webhook only if both TELEGRAM_BOT_TOKEN and WEBHOOK_URL are set
-if [ -n "$TELEGRAM_BOT_TOKEN" ] && [ -n "$WEBHOOK_URL" ] && [ -x "/usr/local/bin/register-telegram-webhook.sh" ]; then
+# Register Telegram webhook if credentials are present and the script is executable
+if [ -n "${TELEGRAM_BOT_TOKEN:-}" ] && [ -n "${WEBHOOK_URL:-}" ] && [ -x "/usr/local/bin/register-telegram-webhook.sh" ]; then
   echo "[start-n8n] Registering Telegram webhook"
   /usr/local/bin/register-telegram-webhook.sh || echo "[start-n8n] Telegram registration failed (continuing)" >&2
 fi
 
-# If no command passed, start n8n with default args
+# ── Start n8n ──────────────────────────────────────────────────────────────────
+
 if [ "$#" -eq 0 ]; then
-  # Try to find n8n in PATH or common install locations and exec it with 'start'
+  # No arguments: find n8n and start it
   if command -v n8n >/dev/null 2>&1; then
     exec n8n start
   elif [ -x "/usr/local/bin/n8n" ]; then
@@ -39,7 +36,7 @@ if [ "$#" -eq 0 ]; then
     exit 127
   fi
 else
-  # If the first arg is the literal 'n8n', replace it with an absolute path if needed
+  # Arguments provided: if the first arg is the literal "n8n", resolve it to an absolute path
   if [ "$1" = "n8n" ]; then
     if command -v n8n >/dev/null 2>&1; then
       BINPATH="$(command -v n8n)"
@@ -50,10 +47,8 @@ else
     else
       BINPATH="n8n"
     fi
-    # remove the first arg and rebuild args with absolute path first
     shift
     set -- "$BINPATH" "$@"
-  fi
   fi
   exec "$@"
 fi
