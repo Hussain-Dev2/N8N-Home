@@ -6,28 +6,33 @@ services:
       dockerfile: Dockerfile.n8n
     # NOTE: Do NOT add an `image:` field here — it overrides build: and prevents
     # Dockerfile.n8n from being used. Remove image: if you see it.
-    environment:
-      - NPM_CONFIG_LOGLEVEL=warn
-      - NODE_FUNCTION_ALLOW_EXTERNAL=telegram-bot-api
-      - N8N_HOST=n8n-home-enk1.onrender.com
-      - N8N_PROTOCOL=https
-      - GENERIC_TIMEZONE=Asia/Baghdad
-      
-      - WEBHOOK_URL=https://n8n-home-enk1.onrender.com
-      - N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true
-      # N8N_PORT is intentionally omitted here.
-      # start-n8n.sh sets it from Render's $PORT at runtime, falling back to 5678.
-      # Setting it here would prevent that override from working.
+    # All environment variables (secrets and non-secrets) live in .env so it is
+    # the single source of truth. Create .env locally and never commit it.
     env_file:
-      # Create a .env file with your secrets (never commit it):
-      #   TELEGRAM_BOT_TOKEN=your_token_here
       - .env
+    # N8N_PORT is intentionally omitted here.
+    # start-n8n.sh sets it from Render's $PORT at runtime, falling back to 5678.
+    # Setting it here would prevent that override from working.
     ports:
       - "5678:5678"
     volumes:
       - n8n_data:/home/node/.n8n
       - ./shared:/data/shared
-    restart: unless-stopped
+    restart: "no"
+    # Healthcheck uses the default local n8n port. On Render the container runs
+    # on $PORT assigned at runtime, but this compose file is for local use so
+    # 5678 is the correct port to check.
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:5678/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    # Prevent Docker Desktop / VPN DNS flakiness from causing DB init failures.
+    # If your network blocks public DNS, remove this and rely on your host resolver.
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
 
 volumes:
   n8n_data:

@@ -1,4 +1,4 @@
-FROM n8nio/n8n:latest
+FROM n8nio/n8n:2.27.4
 
 # Copy a small entrypoint script to allow using $PORT from Render
 COPY --chmod=0755 start-n8n.sh /usr/local/bin/start-n8n.sh

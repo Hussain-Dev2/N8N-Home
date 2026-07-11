@@ -21,20 +21,9 @@ fi
 # ── Start n8n ──────────────────────────────────────────────────────────────────
 
 if [ "$#" -eq 0 ]; then
-  # No arguments: find n8n and start it
-  if command -v n8n >/dev/null 2>&1; then
-    exec n8n start
-  elif [ -x "/usr/local/bin/n8n" ]; then
-    exec /usr/local/bin/n8n start
-  elif [ -x "/usr/bin/n8n" ]; then
-    exec /usr/bin/n8n start
-  elif [ -x "/home/node/.n8n/node_modules/.bin/n8n" ]; then
-    exec /home/node/.n8n/node_modules/.bin/n8n start
-  else
-    echo "Error: n8n binary not found in PATH or common locations." >&2
-    echo "PATH=$PATH" >&2
-    exit 127
-  fi
+  # No arguments: start n8n. The official n8nio/n8n image places the binary on
+  # PATH via a symlink in /usr/local/bin, so no fallback resolution is needed.
+  exec n8n start
 else
   # Arguments provided: if the first arg is the literal "n8n", resolve it to an absolute path
   if [ "$1" = "n8n" ]; then
