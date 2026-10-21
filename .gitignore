@@ -1,0 +1,11 @@
+# Secrets and environment configurations
+.env
+
+# n8n shared files (keep directory structure)
+shared/*
+!shared/.gitkeep
+
+# System and editor files
+.DS_Store
+Thumbs.db
+*.log

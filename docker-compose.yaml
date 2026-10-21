@@ -3,9 +3,9 @@ services:
     container_name: n8n
     build:
       context: .
-      dockerfile: Dockerfile.n8n
+      dockerfile: Dockerfile
     # NOTE: Do NOT add an `image:` field here — it overrides build: and prevents
-    # Dockerfile.n8n from being used. Remove image: if you see it.
+    # Dockerfile from being used. Remove image: if you see it.
     # All environment variables (secrets and non-secrets) live in .env so it is
     # the single source of truth. Create .env locally and never commit it.
     env_file:
@@ -18,7 +18,7 @@ services:
     volumes:
       - n8n_data:/home/node/.n8n
       - ./shared:/data/shared
-    restart: "no"
+    restart: unless-stopped
     # Healthcheck uses the default local n8n port. On Render the container runs
     # on $PORT assigned at runtime, but this compose file is for local use so
     # 5678 is the correct port to check.
@@ -33,6 +33,14 @@ services:
     dns:
       - 8.8.8.8
       - 1.1.1.1
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --url http://n8n:5678
+    depends_on:
+      n8n:
+        condition: service_healthy
 
 volumes:
   n8n_data:
